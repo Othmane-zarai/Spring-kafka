@@ -1,4 +1,4 @@
-package services;
+package com.kafka.tuto.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;

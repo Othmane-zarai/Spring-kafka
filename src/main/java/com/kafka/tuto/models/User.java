@@ -1,4 +1,4 @@
-package models;
+package com.kafka.tuto.models;
 
 public class User {
     private String name;
