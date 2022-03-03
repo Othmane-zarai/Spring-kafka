@@ -2,29 +2,22 @@ package com.kafka.tuto.serializers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka.tuto.models.User;
+import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Serializer;
 
-
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Map;
 
-public class UserSerializer implements Serializer {
+public class UserSerializer implements Serializer<User> {
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
-    public void configure(Map configs, boolean isKey) {
+    public void configure(Map<String, ?> configs, boolean isKey) {
         Serializer.super.configure(configs, isKey);
     }
 
-    public byte[] serialize(String topic, Headers headers, User user) {
-        byte[] retVal = null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            retVal = objectMapper.writeValueAsString(user).getBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return retVal;
+    @Override
+    public byte[] serialize(String topic, Headers headers, User data) {
+        return Serializer.super.serialize(topic, headers, data);
     }
 
     @Override
@@ -33,7 +26,16 @@ public class UserSerializer implements Serializer {
     }
 
     @Override
-    public byte[] serialize(String s, Object o) {
-        return new byte[0];
+    public byte[] serialize(String s, User user) {
+        try {
+            if (user == null){
+                System.out.println("Null received at serializing");
+                return null;
+            }
+            System.out.println("Serializing...");
+            return objectMapper.writeValueAsBytes(user);
+        } catch (Exception e) {
+            throw new SerializationException("Error when serializing MessageDto to byte[]");
+        }
     }
 }
